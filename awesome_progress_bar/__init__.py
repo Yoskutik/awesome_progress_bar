@@ -18,18 +18,21 @@ class ProgressBar:
     except KeyboardInterrupt:
         bar.stop()
     """
-    _loader_states = '⣷⣯⣟⡿⢿⣻⣽⣾'
+    _spinner_states = ('⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
+                      '⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
+                      '⠁ |⠉ |⠈⠁|⠈⠑|⠈⠱|⠈⡱|⢈⡱|⢌⡱|⢎⡱|⢎⡱|⢎⡱|'
+                      '⢆⡱|⢆⡰|⢆⡠|⢆⡀|⢆ |⠆ |⠂ |  ').split('|')
 
     def __init__(self,
-                 total: int,
-                 prefix: str = 'Progress',
-                 suffix: str = 'Complete',
-                 fill: str = '=',
-                 bar_length: int = None,
-                 update_period: float = 0.1,
-                 use_time: bool = True,
-                 time_format: str = 'mm:ss',
-                 use_thread: bool = True):
+                 total,
+                 prefix='Progress',
+                 suffix='Complete',
+                 fill='=',
+                 bar_length=None,
+                 update_period=0.1,
+                 use_time=True,
+                 time_format='mm:ss',
+                 use_thread=True):
         """
         :param total: Total amount of iterations.
         :type total: int
@@ -71,7 +74,7 @@ class ProgressBar:
         self._initial_time = time.time()
         self._iteration = 0
         self._fill = fill
-        self._loader_index = 0
+        self._spinner_index = 0
         self._use_thread = use_thread
         self._time_passed = ''
 
@@ -90,7 +93,7 @@ class ProgressBar:
                 self.stop()
             time.sleep(self.update_period)
 
-    def _get_time_passed(self) -> str:
+    def _get_time_passed(self):
         now = time.time()
         diff = int(now - self._initial_time)
         s = f'{diff % 60:0>2}'
@@ -98,9 +101,9 @@ class ProgressBar:
         h = f'{diff // 60 // 60:0>2}'
         return self.time_format.replace('hh', h).replace('mm', m).replace('ss', s)
 
-    def _get_progress_string(self) -> str:
+    def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
-        length = self.bar_length - len(self.prefix) - len(percent) - len(self.suffix) - 6
+        length = self.bar_length - len(self.prefix) - len(percent) - len(self.suffix) - 7
         filled_length = int(length * self._iteration // self.total)
         bar = self._fill * filled_length + ('>' if filled_length + 1 <= length else '') + \
             ' ' * (length - filled_length - 1)
@@ -108,9 +111,9 @@ class ProgressBar:
             n = int((len(bar) - len(self._time_passed) - 2) / 2)
             bar = f'{bar[:n]} {self._time_passed} {bar[n + len(self._time_passed) + 2:]}'
 
-        loader = ProgressBar._loader_states[self._loader_index]
-        self._loader_index = (self._loader_index + 1) % len(ProgressBar._loader_states)
-        return f'{self.prefix}{loader} |{bar}| {percent}%{self.suffix}'
+        spinner = ProgressBar._spinner_states[self._spinner_index]
+        self._spinner_index = (self._spinner_index + 1) % len(ProgressBar._spinner_states)
+        return f'{self.prefix}{spinner} |{bar}| {percent}%{self.suffix}'
 
     def iter(self):
         """

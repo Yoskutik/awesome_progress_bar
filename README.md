@@ -65,8 +65,8 @@ bar.iter()
 
 In the thread mode progress bar's state is updating by itself every __update_period__
 seconds. In this mode `bar.iter()` doesn't print anything and it used only for tracking
-the progress. In the mode without thread `bar.iter()` print prints the bar every time
-user call it.
+the progress. In the mode without thread `bar.iter()` prints the bar every time user 
+call it.
 
 #### Attention!
 
