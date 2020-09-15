@@ -4,20 +4,6 @@ import shutil
 
 
 class ProgressBar:
-    """
-    An awesome console progress bar. ProgressBar have 2 mods of work. I recommend
-    to run it in the thread mode. This way progress bar would have constant FPS.
-
-    Attention!
-    In case you are using thread mode be aware you are excepting KeyboardInterrupt
-    exception:
-
-    bar = ProgressBar(100)
-    try:
-        bar.iter()
-    except KeyboardInterrupt:
-        bar.stop()
-    """
     _spinner_states = ('⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
                       '⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
                       '⠁ |⠉ |⠈⠁|⠈⠑|⠈⠱|⠈⡱|⢈⡱|⢌⡱|⢎⡱|⢎⡱|⢎⡱|'
@@ -32,7 +18,8 @@ class ProgressBar:
                  update_period=0.1,
                  use_time=True,
                  time_format='mm:ss',
-                 use_thread=True):
+                 use_thread=True,
+                 use_spinner=True):
         """
         :param total: Total amount of iterations.
         :type total: int
@@ -61,6 +48,8 @@ class ProgressBar:
         :type time_format: str
         :param use_thread: If True ProgressBar will create extra thread.
         :type use_thread: bool
+        :param use_spinner: If True the spinner will be shown.
+        :type use_spinner: bool
         """
         self.total = total
         self.prefix = f'{prefix}: ' if prefix else ''
@@ -77,6 +66,7 @@ class ProgressBar:
         self._spinner_index = 0
         self._use_thread = use_thread
         self._time_passed = ''
+        self._use_spinner = use_spinner
 
         if self._use_thread:
             self._thread = threading.Thread(target=self._tick_n_print)
@@ -103,7 +93,12 @@ class ProgressBar:
 
     def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
-        length = self.bar_length - len(self.prefix) - len(percent) - len(self.suffix) - 7
+        if self._use_spinner:
+            spinner = f'{ProgressBar._spinner_states[self._spinner_index]} '
+            self._spinner_index = (self._spinner_index + 1) % len(ProgressBar._spinner_states)
+        else:
+            spinner = ''
+        length = self.bar_length - len(self.prefix + percent + self.suffix + spinner) - 4
         filled_length = int(length * self._iteration // self.total)
         bar = self._fill * filled_length + ('>' if filled_length + 1 <= length else '') + \
             ' ' * (length - filled_length - 1)
@@ -111,9 +106,7 @@ class ProgressBar:
             n = int((len(bar) - len(self._time_passed) - 2) / 2)
             bar = f'{bar[:n]} {self._time_passed} {bar[n + len(self._time_passed) + 2:]}'
 
-        spinner = ProgressBar._spinner_states[self._spinner_index]
-        self._spinner_index = (self._spinner_index + 1) % len(ProgressBar._spinner_states)
-        return f'{self.prefix}{spinner} |{bar}| {percent}%{self.suffix}'
+        return f'{self.prefix}{spinner}|{bar}| {percent}%{self.suffix}'
 
     def iter(self):
         """

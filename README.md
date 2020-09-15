@@ -39,6 +39,7 @@ center of the progress bar written in time_format format. Default is True.
 replaced with amount of elapsed hours, mm - minutes, ss - seconds. Default is 
 'mm:ss'.
 - __use_thread:__ If True ProgressBar will create extra thread. Default is True.
+- __use_spinner:__ If True the spinner will be shown. Default is True.
 
 ```python
 from awesome_progress_bar import ProgressBar
@@ -70,8 +71,9 @@ call it.
 
 #### Attention!
 
-In the thread mode you should handle KeyboardInterrupt exception with `bar.stop()` 
-function:
+If you want to use thread mode and your code may accept exceptions (including
+KeyboardInterrupt) you must handle them using `stop` function. Otherwise the progress bar
+will not stop printing.
 
 ```python
 from awesome_progress_bar import ProgressBar
@@ -82,8 +84,6 @@ try:
     for x in range(100):
         bar.iter()
         time.sleep(0.1)
-except KeyboardInterrupt:
+except:
     bar.stop()
 ``` 
-
-Or you can also use `finally`.
