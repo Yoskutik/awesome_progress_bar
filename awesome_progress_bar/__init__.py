@@ -4,10 +4,13 @@ import shutil
 
 
 class ProgressBar:
-    _spinner_states = ('⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
-                      '⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
-                      '⠁ |⠉ |⠈⠁|⠈⠑|⠈⠱|⠈⡱|⢈⡱|⢌⡱|⢎⡱|⢎⡱|⢎⡱|'
-                      '⢆⡱|⢆⡰|⢆⡠|⢆⡀|⢆ |⠆ |⠂ |  ').split('|')
+    _spinners = {
+        'db': ('⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
+               '⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
+               '⠁ |⠉ |⠈⠁|⠈⠑|⠈⠱|⠈⡱|⢈⡱|⢌⡱|⢎⡱|⢎⡱|⢎⡱|'
+               '⢆⡱|⢆⡰|⢆⡠|⢆⡀|⢆ |⠆ |⠂ |  ').split('|'),
+        'sb': '⠁⠉⠙⠸⢰⣠⣄⡆⠇⠃'
+    }
 
     def __init__(self,
                  total,
@@ -19,6 +22,7 @@ class ProgressBar:
                  use_time=True,
                  time_format='mm:ss',
                  use_thread=True,
+                 spinner_type='sb',
                  use_spinner=True):
         """
         :param total: Total amount of iterations.
@@ -48,6 +52,10 @@ class ProgressBar:
         :type time_format: str
         :param use_thread: If True ProgressBar will create extra thread.
         :type use_thread: bool
+        :param spinner_type: One of ['sb', 'db']. With 'sb' progress bar will print
+        spinner consisting of 1 Braille pattern. 'db' - 2 Braille patterns. Default
+        is 'sb'.
+        :type use_spinner: str
         :param use_spinner: If True the spinner will be shown.
         :type use_spinner: bool
         """
@@ -67,6 +75,7 @@ class ProgressBar:
         self._use_thread = use_thread
         self._time_passed = ''
         self._use_spinner = use_spinner
+        self._spinner_states = ProgressBar._spinners[spinner_type]
 
         if self._use_thread:
             self._thread = threading.Thread(target=self._tick_n_print)
@@ -94,8 +103,8 @@ class ProgressBar:
     def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
         if self._use_spinner:
-            spinner = f'{ProgressBar._spinner_states[self._spinner_index]} '
-            self._spinner_index = (self._spinner_index + 1) % len(ProgressBar._spinner_states)
+            spinner = f'{self._spinner_states[self._spinner_index]} '
+            self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
         else:
             spinner = ''
         length = self.bar_length - len(self.prefix + percent + self.suffix + spinner) - 4

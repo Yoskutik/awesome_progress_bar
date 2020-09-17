@@ -39,6 +39,8 @@ center of the progress bar written in time_format format. Default is True.
 replaced with amount of elapsed hours, mm - minutes, ss - seconds. Default is 
 'mm:ss'.
 - __use_thread:__ If True ProgressBar will create extra thread. Default is True.
+- __spinner_type:__ One of ['sb', 'db']. With 'sb' progress bar will print spinner 
+consisting of 1 Braille pattern. 'db' - 2 Braille patterns. Default is 'sb'. 
 - __use_spinner:__ If True the spinner will be shown. Default is True.
 
 ```python
