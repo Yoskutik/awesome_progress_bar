@@ -23,7 +23,8 @@ class ProgressBar:
                  time_format='mm:ss',
                  use_thread=True,
                  spinner_type='sb',
-                 use_spinner=True):
+                 use_spinner=True,
+                 new_line_at_end=True):
         """
         :param total: Total amount of iterations.
         :type total: int
@@ -58,6 +59,9 @@ class ProgressBar:
         :type use_spinner: str
         :param use_spinner: If True the spinner will be shown.
         :type use_spinner: bool
+        :param new_line_at_end: If True the caret will go to the new line at the end.
+        Default it True.
+        :type new_line_at_end: bool
         """
         self.total = total
         self.prefix = f'{prefix}: ' if prefix else ''
@@ -77,6 +81,7 @@ class ProgressBar:
         self._use_spinner = use_spinner
         self._spinner_states = ProgressBar._spinners[spinner_type]
         self._append = ''
+        self._new_line_at_end = new_line_at_end
 
         if self._use_thread:
             self._thread = threading.Thread(target=self._tick_n_print)
@@ -92,7 +97,7 @@ class ProgressBar:
             if self._iteration != self.total:
                 print(f'\r{progress}', end='')
             else:
-                print(f'\r{progress}')
+                print(f'\r{progress}', end='\n' if (self._iteration == self.total and self._new_line_at_end) else '')
                 self.stop()
             time.sleep(self.update_period)
 
@@ -111,7 +116,7 @@ class ProgressBar:
                 spinner = f'{self._spinner_states[self._spinner_index]} '
                 self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
             else:
-                spinner = ' ' * len(self._spinner_states[0])
+                spinner = ' ' * (len(self._spinner_states[0]) + 1)
         else:
             spinner = ''
         length = self.bar_length - len(self.prefix + percent + self.suffix + spinner) - 4
@@ -136,7 +141,7 @@ class ProgressBar:
         if not self._use_thread:
             self._time_passed = self._get_time_passed()
             progress = self._get_progress_string()
-            print(f'\r{progress}', end='' if self._iteration < self.total else '\n')
+            print(f'\r{progress}', end='\n' if (self._iteration == self.total and self._new_line_at_end) else '')
 
     def stop(self):
         """
