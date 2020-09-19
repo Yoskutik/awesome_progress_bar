@@ -76,10 +76,14 @@ class ProgressBar:
         self._time_passed = ''
         self._use_spinner = use_spinner
         self._spinner_states = ProgressBar._spinners[spinner_type]
+        self._append = ''
 
         if self._use_thread:
             self._thread = threading.Thread(target=self._tick_n_print)
             self._thread.start()
+
+    def __del__(self):
+        self.stopped = True
 
     def _tick_n_print(self):
         while not self.stopped:
@@ -103,8 +107,11 @@ class ProgressBar:
     def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
         if self._use_spinner:
-            spinner = f'{self._spinner_states[self._spinner_index]} '
-            self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
+            if self._iteration < self.total:
+                spinner = f'{self._spinner_states[self._spinner_index]} '
+                self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
+            else:
+                spinner = ' ' * len(self._spinner_states[0])
         else:
             spinner = ''
         length = self.bar_length - len(self.prefix + percent + self.suffix + spinner) - 4
@@ -115,14 +122,17 @@ class ProgressBar:
             n = int((len(bar) - len(self._time_passed) - 2) / 2)
             bar = f'{bar[:n]} {self._time_passed} {bar[n + len(self._time_passed) + 2:]}'
 
-        return f'{self.prefix}{spinner}|{bar}| {percent}%{self.suffix}'
+        return f'{self.prefix}{spinner}|{bar}| {percent}%{self.suffix}{self._append}'
 
-    def iter(self):
+    def iter(self, append=''):
         """
         If in thread process just increases the iteration.
         Otherwise increases it and prints the string.
+        :param append: A string to append after the bar
+        :type append: str
         """
         self._iteration += 1
+        self._append = append
         if not self._use_thread:
             self._time_passed = self._get_time_passed()
             progress = self._get_progress_string()
