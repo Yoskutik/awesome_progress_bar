@@ -17,11 +17,11 @@ loop and each iteration we update its state. But each iteration can take differe
 of time. And each iteration can be longer than 1 minute. And without threads the animation
 would have non-constant amount of FPS.
 
----
+<br />
 
-### How to use
+## How to use
 
-#### Initialization
+### Initialization
 
 Parameters:
 - __total:__ Amount of iterations.
@@ -39,8 +39,9 @@ center of the progress bar written in time_format format. Default is True.
 replaced with amount of elapsed hours, mm - minutes, ss - seconds. Default is 
 'mm:ss'.
 - __use_thread:__ If True ProgressBar will create extra thread. Default is True.
-- __spinner_type:__ One of `['sb', 'db']`. With `'sb'` progress bar will print spinner 
-consisting of 1 Braille pattern. `'db'` - 2 Braille patterns. Default is `'sb'`. 
+- __spinner_type:__ One of `['sb', 'db', 's']`. With `'sb'` progress bar will print 
+spinner consisting of 1 Braille pattern. `'db'` - 2 Braille patterns. `'s'` - a
+slash. Default is `'sb'`. 
 - __use_spinner:__ If True the spinner will be shown. Default is True.
 - __new_line_at_end:__ If True the caret will go to the new line at the end.
 Default it True.
@@ -49,65 +50,86 @@ printed. Default is False.
 - __eta_format:__ The format of ETA. Similar to the __time_format__. Default is 
 'mm:ss'.
 
-```python
-from awesome_progress_bar import ProgressBar
+<br />
 
-bar = ProgressBar(100)
-# Progress: ⡆ |=>                              00:01                                |   1.00% Complete
+### Methods
 
-bar = ProgressBar(100, prefix='Prefix', suffix='Suffix', bar_length=70)
-# Prefix: ⡆ |=>                 00:01                   |   1.00% Suffix
+- [iter(append)](#iter): Used for tracking the progress.
+- [stop()](#stop): Stops the bar in the thread mode.
+- [wait()](#wait): Blocks the program until bar is dead.
 
-bar = ProgressBar(100, fill='#', use_time=False, bar_length=70)
-# Progress: ⡆ |#>                                     |   3.00% Complete
+<br />
 
-bar = ProgressBar(100, time_format='hh mm:ss', bar_length=70)
-# Progress: ⡆ |>              00 00:01                |   1.00% Complete
-
-bar = ProgressBar(100, bar_length=70, use_eta=True, spinner_type='db')
-# Progress: ⢌⡱ |===>           00:03                |  10.00% ETA: 00:33
-```
-
-#### Progress
-
-Each iteration user should call
+<h5 id="iter">bar.iter(append='')</h5>
 ```python
 bar.iter(append='')
 ```
-
-In the thread mode progress bar's state is updating by itself every __update_period__
-seconds. In this mode `bar.iter()` doesn't print anything and it used only for tracking
-the progress. In the mode without thread `bar.iter()` prints the bar every time user 
-call it.
+Used for tracking the progress.
+- In the thread mode only increases the number of iteration.
+- Without extra thread `bar.iter()` prints the bar each time user call it.
 
 Parameters:
-- __append:__ A string to append after the bar
+- __append:__ A string to append after the bar. The appended text doesn't effect on
+the progress bar width. 
 
-```python
-bar = ProgressBar(100, bar_length=70)
-bar.iter(' appended text')
-# Progress: ⠁ |>                                   00:00                                     |   1.00% appended text
-```
+<br />
 
-#### Attention!
+<h5 id="stop">bar.stop()</h5>
 
-If you want to use thread mode and your code may accept exceptions (including
-KeyboardInterrupt) you must handle them using `stop` function. Otherwise the progress bar
-may not stop printing.
+Stops the bar if it run in the thread mode.
+
+If the user doesn't stop the bar, it will update endlessly. Therefore, I recommend updating 
+the bar using `bar.iter()` in the try/except block, and calling `bar.stop()` in the `except` 
+or `finally` blocks.
+
+<br />
+
+<h5 id="wait">bar.wait()</h5>
+
+Blocks the program until bar is dead.
+
+The bar updates every __update_period__ seconds in the thread mode. Hence, there can be a small
+delay between last calling `bar.iter()` and next try for printing something. So, if you want to
+print anything after the progress is done be aware to use `bar.wait()`  
+
+<br />
+
+### Examples
 
 ```python
 from awesome_progress_bar import ProgressBar
 import time
 
-bar = ProgressBar(100)
+total = 133
+bar = ProgressBar(total, bar_length=50)
 try:
-    for x in range(100):
-        bar.iter()
+    for x in range(total):
         time.sleep(0.1)
+        bar.iter(' Appended')
 except:
     bar.stop()
-``` 
+bar.wait()
+print('Bar is done')
 
+# Progress:   |====== 00:14 ======| 100.00% Complete Appended
+# Bar is done
+```
+```python
+from awesome_progress_bar import ProgressBar
+
+bar = ProgressBar(100, prefix='Prefix', suffix='Suffix', bar_length=50)
+# Prefix: ⡆ |=>       00:00         |   4.51% Suffix
+
+bar = ProgressBar(100, fill='#', use_time=False, bar_length=50, use_spinner=False)
+# Progress: |>                    |   3.01% Complete
+
+bar = ProgressBar(100, time_format='hhh mmmin sss', use_eta=True, bar_length=70, spinner_type='s')
+# Progress: \ |==>         00h 00min 01s            |   7.52% ETA: 00:12
+
+bar = ProgressBar(100, bar_length=70, spinner_type='db')
+# Progress: ⢈⡱ |=========>      00:03                 |  25.56% Complete
+```
+ 
 ---
 
 Feel free to suggest ideas to improve this package in the GitHub's Issues section.

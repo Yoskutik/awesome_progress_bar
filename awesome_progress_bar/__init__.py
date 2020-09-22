@@ -10,7 +10,8 @@ class ProgressBar:
                '⠁ |⠉ |⠉⠁|⠈⠉| ⠙| ⠸| ⢰| ⣠|⢀⣀|⣀⡀|⣄ |⡆ |⠇ |⠃ |'
                '⠁ |⠉ |⠈⠁|⠈⠑|⠈⠱|⠈⡱|⢈⡱|⢌⡱|⢎⡱|⢎⡱|⢎⡱|'
                '⢆⡱|⢆⡰|⢆⡠|⢆⡀|⢆ |⠆ |⠂ |  ').split('|'),
-        'sb': '⠁⠉⠙⠸⢰⣠⣄⡆⠇⠃'
+        'sb': '⠁⠉⠙⠸⢰⣠⣄⡆⠇⠃',
+        's': '|/-\\',
     }
 
     def __init__(self,
@@ -56,9 +57,9 @@ class ProgressBar:
         :type time_format: str
         :param use_thread: If True ProgressBar will create extra thread.
         :type use_thread: bool
-        :param spinner_type: One of ['sb', 'db']. With 'sb' progress bar will print
-        spinner consisting of 1 Braille pattern. 'db' - 2 Braille patterns. Default
-        is 'sb'.
+        :param spinner_type: One of ['sb', 'db', 's']. With 'sb' progress bar will print
+        spinner consisting of 1 Braille pattern. 'db' - 2 Braille patterns. 's' - a slash
+        Default is 'sb'.
         :type use_spinner: str
         :param use_spinner: If True the spinner will be shown.
         :type use_spinner: bool
@@ -110,7 +111,7 @@ class ProgressBar:
                 print(f'\r{progress}', end='')
             else:
                 print(f'\r{progress}', end='\n' if (self._iteration == self.total and self._new_line_at_end) else '')
-                self.stop()
+                self.stopped = True
             time.sleep(self.update_period)
 
     def _get_time_passed(self):
@@ -133,9 +134,7 @@ class ProgressBar:
         else:
             spinner = ''
 
-        if self.use_eta and self._iteration == self.total:
-            suffix = self.suffix.rjust(len(self._eta) + 1)
-        elif self._iteration != self.total:
+        if self.use_eta and self._iteration != self.total:
             suffix = self._eta
         else:
             suffix = self.suffix
@@ -180,6 +179,15 @@ class ProgressBar:
         """
         Stops the bar. There's no need to use it without thread mode.
         """
-        self.stopped = True
-        if self._iteration < self.total:
-            print()
+        if not self.stopped:
+            self.stopped = True
+            if self._iteration < self.total:
+                print()
+            self._thread.join()
+
+    def wait(self):
+        """
+        Blocks the program until bar is dead.
+        """
+        if self._thread.is_alive():
+            self._thread.join()
