@@ -19,9 +19,9 @@ would have non-constant amount of FPS.
 
 <br />
 
-## How to use
+# How to use
 
-### Initialization
+## Initialization
 
 Parameters:
 - __total:__ Amount of iterations.
@@ -52,7 +52,7 @@ printed. Default is False.
 
 <br />
 
-### Methods
+## Methods
 
 - [iter(append)](#iter): Used for tracking the progress.
 - [stop()](#stop): Stops the bar in the thread mode.
@@ -60,10 +60,8 @@ printed. Default is False.
 
 <br />
 
-<h5 id="iter">bar.iter(append='')</h5>
-```python
-bar.iter(append='')
-```
+<h4 id="iter">bar.iter(append='')</h4>
+
 Used for tracking the progress.
 - In the thread mode only increases the number of iteration.
 - Without extra thread `bar.iter()` prints the bar each time user call it.
@@ -74,7 +72,7 @@ the progress bar width.
 
 <br />
 
-<h5 id="stop">bar.stop()</h5>
+<h4 id="stop">bar.stop()</h4>
 
 Stops the bar if it run in the thread mode.
 
@@ -84,7 +82,7 @@ or `finally` blocks.
 
 <br />
 
-<h5 id="wait">bar.wait()</h5>
+<h4 id="wait">bar.wait()</h4>
 
 Blocks the program until bar is dead.
 

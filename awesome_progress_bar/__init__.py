@@ -125,12 +125,9 @@ class ProgressBar:
     def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
 
-        if self._use_spinner:
-            if self._iteration < self.total:
-                spinner = f'{self._spinner_states[self._spinner_index]} '
-                self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
-            else:
-                spinner = ' ' * (len(self._spinner_states[0]) + 1)
+        if self._use_spinner and self._iteration < self.total:
+            spinner = f'{self._spinner_states[self._spinner_index]} '
+            self._spinner_index = (self._spinner_index + 1) % len(self._spinner_states)
         else:
             spinner = ''
 
