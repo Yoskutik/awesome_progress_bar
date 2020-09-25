@@ -117,8 +117,8 @@ class ProgressBar:
     def _get_time_passed(self):
         now = time.time()
         diff = int(now - self._initial_time)
-        s = f'{diff % 60:0>2}'
-        m = f'{diff // 60 % 60:0>2}'
+        s = f'{diff % 60:0>2}' if 'mm' in self.time_format or 'hh' in self.time_format else f'{diff:0>2}'
+        m = f'{diff // 60 % 60:0>2}' if 'hh' in self.time_format else f'{diff // 60:0>2}'
         h = f'{diff // 60 // 60:0>2}'
         return self.time_format.replace('hh', h).replace('mm', m).replace('ss', s)
 
