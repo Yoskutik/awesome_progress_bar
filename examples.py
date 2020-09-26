@@ -1,7 +1,7 @@
 from awesome_progress_bar import ProgressBar
 import time
 
-total = 13
+total = 133
 bar = ProgressBar(total)
 try:
     for x in range(total):
@@ -13,7 +13,7 @@ bar.wait()
 # Progress: |================================ 00:01 ================================| 100.00% Complete
 
 
-bar = ProgressBar(total, 'Prefix', 'Suffix')
+bar = ProgressBar(total, 'Prefix', 'Suffix', use_eta=True)
 try:
     for x in range(total):
         time.sleep(0.1)

@@ -103,6 +103,13 @@ class ProgressBar:
     def __del__(self):
         self.stopped = True
 
+    @staticmethod
+    def _format_time_string(seconds, time_format):
+        s = f'{seconds % 60:0>2}' if 'mm' in time_format or 'hh' in time_format else f'{seconds:0>2}'
+        m = f'{seconds // 60 % 60:0>2}' if 'hh' in time_format else f'{seconds // 60:0>2}'
+        h = f'{seconds // 60 // 60:0>2}'
+        return h, m, s
+
     def _tick_n_print(self):
         while not self.stopped:
             self._time_passed = self._get_time_passed()
@@ -117,10 +124,14 @@ class ProgressBar:
     def _get_time_passed(self):
         now = time.time()
         diff = int(now - self._initial_time)
-        s = f'{diff % 60:0>2}' if 'mm' in self.time_format or 'hh' in self.time_format else f'{diff:0>2}'
-        m = f'{diff // 60 % 60:0>2}' if 'hh' in self.time_format else f'{diff // 60:0>2}'
-        h = f'{diff // 60 // 60:0>2}'
-        return self.time_format.replace('hh', h).replace('mm', m).replace('ss', s)
+        h, m, s = self._format_time_string(diff, self.time_format)
+        time_passed = self.time_format.replace('hh', h).replace('mm', m).replace('ss', s)
+        if self.use_eta and 1 < self._iteration < self.total:
+            return f'{time_passed}/{self._eta}'
+        elif self.use_eta and self._iteration == 1:
+            return f'{time_passed}/{self._eta}'
+        else:
+            return time_passed
 
     def _get_progress_string(self):
         percent = f"{100 * self._iteration / self.total:>6.2f}"
@@ -131,12 +142,7 @@ class ProgressBar:
         else:
             spinner = ''
 
-        if self.use_eta and self._iteration != self.total:
-            suffix = self._eta
-        else:
-            suffix = self.suffix
-
-        length = self.bar_length - len(self.prefix + percent + suffix + spinner) - 4
+        length = self.bar_length - len(self.prefix + percent + self.suffix + spinner) - 4
         filled_length = int(length * self._iteration // self.total)
         bar = self._fill * filled_length + ('>' if filled_length + 1 <= length else '') + \
             ' ' * (length - filled_length - 1)
@@ -144,7 +150,7 @@ class ProgressBar:
             n = int((len(bar) - len(self._time_passed) - 2) / 2)
             bar = f'{bar[:n]} {self._time_passed} {bar[n + len(self._time_passed) + 2:]}'
 
-        return f'{self.prefix}{spinner}|{bar}| {percent}%{suffix}{self._append}'
+        return f'{self.prefix}{spinner}|{bar}| {percent}%{self.suffix}{self._append}'
 
     def iter(self, append=''):
         """
@@ -157,15 +163,10 @@ class ProgressBar:
         self._append = append
 
         if self.use_eta:
-            if self._iteration > 1:
-                diff = time.time() - self._initial_time
-                time_left = int(math.floor(diff * self.total / self._iteration) - diff)
-                s = f'{time_left % 60:0>2}'
-                m = f'{time_left // 60 % 60:0>2}'
-                h = f'{time_left // 60 // 60:0>2}'
-                self._eta = f' ETA: {self.eta_format.replace("hh", h).replace("mm", m).replace("ss", s)}'
-            else:
-                self._eta = f' ETA: {self.eta_format.replace("hh", "--").replace("mm", "--").replace("ss", "--")}'
+            diff = time.time() - self._initial_time
+            total_needed = int(math.floor(diff * self.total / self._iteration))
+            h, m, s = self._format_time_string(total_needed, self.eta_format)
+            self._eta = self.eta_format.replace("hh", h).replace("mm", m).replace("ss", s)
 
         if not self._use_thread:
             self._time_passed = self._get_time_passed()
