@@ -26,9 +26,9 @@ class ProgressBar:
                  use_thread=True,
                  spinner_type='sb',
                  use_spinner=True,
-                 new_line_at_end=True,
+                 last_char=True,
                  use_eta=False,
-                 eta_format='mm:ss'):
+                 eta_format=None):
         """
         :param total: Total amount of iterations.
         :type total: int
@@ -63,14 +63,14 @@ class ProgressBar:
         :type use_spinner: str
         :param use_spinner: If True the spinner will be shown.
         :type use_spinner: bool
-        :param new_line_at_end: If True the caret will go to the new line at the end.
-        Default it True.
-        :type new_line_at_end: bool
+        :param last_char: Something, that will be printed after the progress is done.
+        Default is '\n'
+        :type last_char: str
         :param use_eta: If True the information about approximate remaining time
         will be printed. Default is False.
         :type use_eta: bool
         :param eta_format: The format of ETA. Similar to the time_format. Default is
-        'mm:ss'.
+        equal to the time_format.
         :type eta_format: str
         """
         self.total = total
@@ -82,7 +82,7 @@ class ProgressBar:
         self.use_time = use_time
         self.time_format = time_format
         self.use_eta = use_eta
-        self.eta_format = eta_format
+        self.eta_format = eta_format if eta_format else time_format
 
         self._initial_time = time.time()
         self._iteration = 0
@@ -93,7 +93,7 @@ class ProgressBar:
         self._use_spinner = use_spinner
         self._spinner_states = ProgressBar._spinners[spinner_type]
         self._append = ''
-        self._new_line_at_end = new_line_at_end
+        self._last_char = last_char
         self._eta = ''
 
         if self._use_thread:
@@ -102,6 +102,7 @@ class ProgressBar:
 
     def __del__(self):
         self.stopped = True
+        self._last_time = time.time()
 
     @staticmethod
     def _format_time_string(seconds, time_format):
@@ -112,18 +113,21 @@ class ProgressBar:
 
     def _tick_n_print(self):
         while not self.stopped:
-            self._time_passed = self._get_time_passed()
+            self._time_passed = self.get_time_passed()
             progress = self._get_progress_string()
             if self._iteration != self.total:
                 print(f'\r{progress}', end='')
             else:
-                print(f'\r{progress}', end='\n' if (self._iteration == self.total and self._new_line_at_end) else '')
+                print(f'\r{progress}', end=self._last_char if self._iteration == self.total else '')
                 self.stopped = True
+                self._last_time = time.time()
             time.sleep(self.update_period)
 
-    def _get_time_passed(self):
-        now = time.time()
-        diff = int(now - self._initial_time)
+    def get_time_passed(self, return_str=True):
+        diff = (self._last_time if self.stopped else time.time()) - self._initial_time
+        if not return_str:
+            return diff
+        diff = round(diff)
         h, m, s = self._format_time_string(diff, self.time_format)
         time_passed = self.time_format.replace('hh', h).replace('mm', m).replace('ss', s)
         if self.use_eta and 1 < self._iteration < self.total:
@@ -164,14 +168,14 @@ class ProgressBar:
 
         if self.use_eta:
             diff = time.time() - self._initial_time
-            total_needed = int(math.floor(diff * self.total / self._iteration))
+            total_needed = int(round(diff * self.total / self._iteration))
             h, m, s = self._format_time_string(total_needed, self.eta_format)
             self._eta = self.eta_format.replace("hh", h).replace("mm", m).replace("ss", s)
 
         if not self._use_thread:
-            self._time_passed = self._get_time_passed()
+            self._time_passed = self.get_time_passed()
             progress = self._get_progress_string()
-            print(f'\r{progress}', end='\n' if (self._iteration == self.total and self._new_line_at_end) else '')
+            print(f'\r{progress}', end=self._last_char if self._iteration == self.total else '')
 
     def stop(self):
         """
@@ -179,6 +183,7 @@ class ProgressBar:
         """
         if not self.stopped:
             self.stopped = True
+            self._last_time = time.time()
             if self._iteration < self.total:
                 print()
             self._thread.join()

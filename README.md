@@ -23,76 +23,136 @@ would have non-constant amount of FPS.
 
 ## Initialization
 
-Parameters:
-- __total:__ Amount of iterations.
-- __prefix:__ A short message before the progress bar. Default is 'Progress'.
-- __suffix:__ A short message after the progress bar. Default is 'Complete'.
-- __fill:__ A character that will be used as progress bar filler.
-- __bar_length:__ The length of the whole string (including prefix, spinner,
-progress bar, percents and suffix). Default is equal to the minimum between 
-terminal's width and 100.
-- __update_period:__ The duration of pause between iterations in seconds.
-Default is 0.1. Works only if __use_thread__ is True.
-- __use_time:__ If True there will be an information about elapsed time in the
-center of the progress bar written in time_format format. Default is True.
-- __time_format:__ String, that should include hh, mm or/and ss. hh will be
-replaced with amount of elapsed hours, mm - minutes, ss - seconds. Default is 
-'mm:ss'.
-- __use_thread:__ If True ProgressBar will create extra thread. Default is True.
-- __spinner_type:__ One of `['sb', 'db', 's']`. With `'sb'` progress bar will print 
-spinner consisting of 1 Braille pattern. `'db'` - 2 Braille patterns. `'s'` - a
-slash. Default is `'sb'`. 
-- __use_spinner:__ If True the spinner will be shown. Default is True.
-- __new_line_at_end:__ If True the caret will go to the new line at the end.
-Default it True.
-- __use_eta:__ If True the information about approximate remaining time will be 
-printed. Default is False.
-- __eta_format:__ The format of ETA. Similar to the __time_format__. Default is 
-'mm:ss'.
+#### Parameters:
 
-<br />
+<table>
+    <tr>
+        <td><b>total</b></td>
+        <td>Amount of iterations</td>
+    </tr>
+    <tr>
+        <td><b>prefix</b></td>
+        <td>A short message before the progress bar. Default is <code>'Progress'</code></td>
+    </tr>
+    <tr>
+        <td><b>suffix</b></td>
+        <td>A short message after the progress bar. Default is <code>''</code></td>
+    </tr>
+    <tr>
+        <td><b>fill</b></td>
+        <td>A character that will be used as progress bar filler. Default is <code>'='</code></td>
+    </tr>
+    <tr>
+        <td><b>bar_length</b></td>
+        <td>The length of the whole string (including prefix, spinner, progress bar, percents and 
+        suffix). Default is equal to the minimum between terminal's width and 100</td>
+    </tr>
+    <tr>
+        <td><b>update_period</b></td>
+        <td>The duration of pause between iterations in seconds. Default is <code>0.1</code>. Works 
+        only if <b>use_thread</b> is <code>True</code></td>
+    </tr>
+    <tr>
+        <td><b>use_time</b></td>
+        <td>If <code>True</code> there will be an information about elapsed time in the center of 
+        the progress bar written in <b>time_format</b> format. Default is <code>True</code></td>
+    </tr>
+    <tr>
+        <td><b>time_format</b></td>
+        <td>String, that should include <code>'hh'</code>, <code>'mm'</code> or/and <code>'ss'</code>. 
+        <code>'hh'</code> will be replaced with amount of elapsed hours, <code>'mm'</code> - minutes, 
+        <code>'ss'</code> - seconds. Default is <code>'mm:ss'</code></td>
+    </tr>
+    <tr>
+        <td><b>use_thread</b></td>
+        <td>If <code>True</code> ProgressBar will create extra thread. Default is <code>True</code></td>
+    </tr>
+    <tr>
+        <td><b>spinner_type</b></td>
+        <td>One of <code>['sb', 'db', 's']</code>. With <code>'sb'</code> progress bar will print 
+        spinner consisting of 1 Braille pattern. <code>'db'</code> - 2 Braille patterns. 
+        <code>'s'</code> - a slash. Default is <code>'sb'</code></td>
+    </tr>
+    <tr>
+        <td><b>use_spinner</b></td>
+        <td>If <code>True</code> the spinner will be shown. Default is <code>True</code></td>
+    </tr>
+    <tr>
+        <td><b>last_char</b></td>
+        <td>Something, that will be printed after the progress is done. Default is <code>'\n'</code></td>
+    </tr>
+    <tr>
+        <td><b>use_eta</b></td>
+        <td>If <code>True</code> the information about approximate remaining time will be printed. 
+        Default is <code>False</code></td>
+    </tr>
+    <tr>
+        <td><b>eta_format</b></td>
+        <td>The format of ETA. Similar to the <b>time_format</b>. Default is equal to the 
+        <b>time_format</b></td>
+    </tr>
+</table>
 
 ## Methods
 
-- [iter(append)](#iter): Used for tracking the progress.
-- [stop()](#stop): Stops the bar in the thread mode.
-- [wait()](#wait): Blocks the program until bar is dead.
+<table>
+    <tr>
+        <td><b>iter(append='')</b></td>
+        <td>
+            <p>Used for tracking the progress.</p>
+            <ul>
+                <li>In the thread mode only increases the number of iteration.</li>
+                <li>Without extra thread <code>bar.iter()</code> prints the bar each time user call it.</li>
+            </ul>
+            Parameters:
+            <ul>
+                <li><b>append:</b> A string to append after the bar. The appended text doesn't effect 
+                on the progress bar width. </li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><b>get_time_passed (return_str=True)</b></td>
+        <td>
+            <p>Returns the time spent.</p>
+            <p>
+                If the progress is done returns bar's operating time. If not - returns the time elapsed 
+                from the progress start.
+            </p>
+            Parameters:
+            <ul>
+                <li><b>return_str:</b> If <code>True</code> returns time in the <b>time_format</b>
+                format. If not returns just amount of seconds</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><b>stop()</b></td>
+        <td>
+            <p>Stops the bar in the thread mode.</p>
+            <p>
+                If the bar doesn't call the <code>iter</code> function the required number of times, the 
+                created thread will run until you call the <stop>stop</stop> function.
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td><b>wait()</b></td>
+        <td>
+            <p>Blocks the program until bar is dead.</p>
+            <p>
+                The bar updates every <b>update_period</b> seconds in the thread mode. Hence, there can 
+                be a small delay between last calling <code>bar.iter()</code> and next try for printing 
+                something. So, if you want to print anything after the progress is done be aware to use
+                <code>bar.wait()</code>  
+            </p>
+        </td>
+    </tr>
+</table>
 
-<br />
+\* `stop()` and `wait()` are needed only in the thread mode.
 
-<h4 id="iter">bar.iter(append='')</h4>
-
-Used for tracking the progress.
-- In the thread mode only increases the number of iteration.
-- Without extra thread `bar.iter()` prints the bar each time user call it.
-
-Parameters:
-- __append:__ A string to append after the bar. The appended text doesn't effect on
-the progress bar width. 
-
-<br />
-
-<h4 id="stop">bar.stop()</h4>
-
-Stops the bar if it run in the thread mode.
-
-If the user doesn't stop the bar, it will update endlessly. Therefore, I recommend updating 
-the bar using `bar.iter()` in the try/except block, and calling `bar.stop()` in the `except` 
-or `finally` blocks.
-
-<br />
-
-<h4 id="wait">bar.wait()</h4>
-
-Blocks the program until bar is dead.
-
-The bar updates every __update_period__ seconds in the thread mode. Hence, there can be a small
-delay between last calling `bar.iter()` and next try for printing something. So, if you want to
-print anything after the progress is done be aware to use `bar.wait()`  
-
-<br />
-
-### Examples
+## Examples
 
 ```python
 from awesome_progress_bar import ProgressBar
@@ -115,14 +175,14 @@ print('Bar is done')
 ```python
 from awesome_progress_bar import ProgressBar
 
-bar = ProgressBar(100, prefix='Prefix', suffix='Suffix', bar_length=50)
-# Prefix: ⡆ |=>       00:00         |   4.51% Suffix
+bar = ProgressBar(100, prefix='Prefix', suffix='Suffix', use_eta=True, bar_length=70)
+# Prefix: ⠇ |==>             00:00/00:14                |   5.26% Suffix
 
 bar = ProgressBar(100, fill='#', use_time=False, bar_length=50, use_spinner=False)
-# Progress: |>                    |   3.01% Complete
+# Progress: |##>                  |   9.01% Complete
 
-bar = ProgressBar(100, time_format='hhh mmmin sss', use_eta=True, bar_length=70, spinner_type='s')
-# Progress: \ |==>         00h 00min 01s            |   7.52% ETA: 00:12
+bar = ProgressBar(100, time_format='hhh mmmin sss', bar_length=70, spinner_type='s')
+# Progress: | |=======>     00h 00min 02s             |  18.05% Complete
 
 bar = ProgressBar(100, bar_length=70, spinner_type='db')
 # Progress: ⢈⡱ |=========>      00:03                 |  25.56% Complete
