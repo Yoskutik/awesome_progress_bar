@@ -169,7 +169,7 @@ except:
 bar.wait()
 print('Bar is done')
 
-# Progress:   |====== 00:14 ======| 100.00% Complete Appended
+# Progress: |=========== 00:15 ============| 100.00% Appended
 # Bar is done
 ```
 ```python
@@ -179,13 +179,13 @@ bar = ProgressBar(100, prefix='Prefix', suffix='Suffix', use_eta=True, bar_lengt
 # Prefix: ⠇ |==>             00:00/00:14                |   5.26% Suffix
 
 bar = ProgressBar(100, fill='#', use_time=False, bar_length=50, use_spinner=False)
-# Progress: |##>                  |   9.01% Complete
+# Progress: |##########>                   |  33.83%
 
 bar = ProgressBar(100, time_format='hhh mmmin sss', bar_length=70, spinner_type='s')
-# Progress: | |=======>     00h 00min 02s             |  18.05% Complete
+# Progress: - |=======>         00h 00min 02s                  |  16.54%
 
 bar = ProgressBar(100, bar_length=70, spinner_type='db')
-# Progress: ⢈⡱ |=========>      00:03                 |  25.56% Complete
+# Progress: ⢈⡱ |===========>         00:04                     |  24.81%
 ```
  
 ---

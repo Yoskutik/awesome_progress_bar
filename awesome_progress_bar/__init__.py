@@ -1,7 +1,6 @@
 import time
 import threading
 import shutil
-import math
 
 
 class ProgressBar:
@@ -17,7 +16,7 @@ class ProgressBar:
     def __init__(self,
                  total,
                  prefix='Progress',
-                 suffix='Complete',
+                 suffix='',
                  fill='=',
                  bar_length=None,
                  update_period=0.1,
@@ -26,7 +25,7 @@ class ProgressBar:
                  use_thread=True,
                  spinner_type='sb',
                  use_spinner=True,
-                 last_char=True,
+                 last_char='\n',
                  use_eta=False,
                  eta_format=None):
         """
