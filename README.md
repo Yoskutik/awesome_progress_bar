@@ -187,6 +187,8 @@ bar = ProgressBar(100, time_format='hhh mmmin sss', bar_length=70, spinner_type=
 bar = ProgressBar(100, bar_length=70, spinner_type='db')
 # Progress: ⢈⡱ |===========>         00:04                     |  24.81%
 ```
+
+See more [here](https://github.com/Yoskutik/awesome_progress_bar/blob/master/examples.py).
  
 ---
 
