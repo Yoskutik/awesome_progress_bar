@@ -1,0 +1,3 @@
+exclude preview.gif
+exclude examples.py
+recursive-exclude test *.py
