@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="awesome-progress-bar",
-    version="1.7.0",
+    version="1.7.0-beta1",
     author="Yoskutik",
     author_email="yoskutik@gmail.com",
     description="Progress bar for terminal",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/yoskutik/awesome_progress_bar",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['test', 'preview.gif']),
     classifiers=[
         "Programming Language :: Python :: 3.4",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
