@@ -4,7 +4,7 @@
 ![](https://img.shields.io/pypi/l/awesome-progress-bar?color=blue&style=flat-square)
 ![](https://img.shields.io/pypi/pyversions/awesome-progress-bar?style=flat-square)
 
-<img width="800" src="https://github.com/Yoskutik/awesome_progress_bar/raw/master/preview.gif" />
+![](https://github.com/Yoskutik/awesome_progress_bar/raw/master/preview.gif)
 
 It's a progress bar for the terminal. But why it is awesome?
 - It has thread mode. This way progress bar can run in the parallel.
