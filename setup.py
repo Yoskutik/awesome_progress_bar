@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="awesome-progress-bar",
-    version="1.6.5",
+    version="1.7.0",
     author="Yoskutik",
     author_email="yoskutik@gmail.com",
     description="Progress bar for terminal",
